@@ -1,11 +1,11 @@
 require("dotenv").config();
-const { Client, GatewayIntentBits } = require("discord.js");
+const { Client, GatewayIntentBits, ActivityType } = require("discord.js");
 const Parser = require("rss-parser");
 const NodeCache = require("node-cache");
 
 const parser = new Parser();
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
-const cache = new NodeCache({ stdTTL: 0 }); // ไม่มีหมดอายุ (หรือกำหนดเองได้)
+const cache = new NodeCache({ stdTTL: 0 });
 
 const CHANNEL_ID = process.env.YOUTUBE_CHANNEL_ID;
 const RSS_URL = `https://www.youtube.com/feeds/videos.xml?channel_id=${CHANNEL_ID}`;
@@ -28,8 +28,15 @@ async function checkForNewVideo() {
 
 client.once("ready", () => {
     console.log(`✅ Logged in as ${client.user.tag}`);
+    client.user.setPresence({
+        status: 'online', // online, idle, dnd (Do Not Disturb), invisible
+        activities: [{
+            name: process.env.ACTIVITY_NAME,
+            type: ActivityType[process.env.ACTIVITY_TYPE], // Playing, Streaming, Listening, Watching, Competing
+        }],
+    });
     checkForNewVideo();
-    setInterval(checkForNewVideo, 10 * 60 * 1000); // ทุก 10 นาที
+    setInterval(checkForNewVideo, 10 * 60 * 1000); // Every 10 Mins
 });
 
 client.login(process.env.DISCORD_TOKEN);
