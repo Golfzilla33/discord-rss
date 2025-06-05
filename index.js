@@ -2,6 +2,8 @@ require("dotenv").config();
 const { Client, GatewayIntentBits, ActivityType } = require("discord.js");
 const Parser = require("rss-parser");
 const NodeCache = require("node-cache");
+const http = require("http");
+const PORT = process.env.PORT || 3000;
 
 const parser = new Parser();
 const client = new Client({ intents: [GatewayIntentBits.Guilds] });
@@ -40,3 +42,10 @@ client.once("ready", () => {
 });
 
 client.login(process.env.DISCORD_TOKEN);
+
+http.createServer((req, res) => {
+    res.writeHead(200);
+    res.end("Bot is running");
+}).listen(PORT, () => {
+    console.log(`HTTP server running on port ${PORT}`);
+});
